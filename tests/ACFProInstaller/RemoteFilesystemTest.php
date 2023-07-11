@@ -1,15 +1,16 @@
 <?php namespace PhilippBaschke\ACFProInstaller\Test;
 
 use PhilippBaschke\ACFProInstaller\RemoteFilesystem;
+use \PHPUnit\Framework\TestCase;
 
-class RemoteFilesystemTest extends \PHPUnit_Framework_TestCase
+class RemoteFilesystemTest extends TestCase
 {
     protected $io;
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->io = $this->getMock('Composer\IO\IOInterface');
+        $this->io = $this->getMockBuilder('Composer\IO\IOInterface')->getMock();
     }
 
     public function testExtendsComposerRemoteFilesystem()

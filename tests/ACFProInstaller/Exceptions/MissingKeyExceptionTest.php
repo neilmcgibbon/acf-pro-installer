@@ -1,8 +1,9 @@
 <?php namespace PhilippBaschke\ACFProInstaller\Test\Exceptions;
 
+use \PHPUnit\Framework\TestCase;
 use PhilippBaschke\ACFProInstaller\Exceptions\MissingKeyException;
 
-class MissingKeyExceptionTest extends \PHPUnit_Framework_TestCase
+class MissingKeyExceptionTest extends TestCase
 {
     public function testMessage()
     {

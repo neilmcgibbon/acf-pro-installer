@@ -31,7 +31,7 @@ class RemoteFilesystem extends \Composer\Util\RemoteFilesystem
     public function __construct(
         $acfFileUrl,
         IOInterface $io,
-        Config $config = null,
+        Config $config = new \Composer\Config(),
         array $options = [],
         $disableTls = false
     ) {

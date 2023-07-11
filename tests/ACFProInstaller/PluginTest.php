@@ -3,8 +3,9 @@
 use Composer\Installer\PackageEvents;
 use Composer\Plugin\PluginEvents;
 use PhilippBaschke\ACFProInstaller\Plugin;
+use \PHPUnit\Framework\TestCase;
 
-class PluginTest extends \PHPUnit_Framework_TestCase
+class PluginTest extends TestCase
 {
     const REPO_NAME = 'advanced-custom-fields/advanced-custom-fields-pro';
     const REPO_TYPE = 'wordpress-plugin';
@@ -12,7 +13,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
       'https://connect.advancedcustomfields.com/index.php?p=pro&a=download';
     const KEY_ENV_VARIABLE = 'ACF_PRO_KEY';
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // Unset the environment variable after every test
         // See: http://stackoverflow.com/a/34065522
@@ -48,8 +49,13 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $plugin = new Plugin;
         $plugin->activate($composer, $io);
 
-        $this->assertAttributeEquals($composer, 'composer', $plugin);
-        $this->assertAttributeEquals($io, 'io', $plugin);
+        $reflectedComposer = (new \ReflectionObject($plugin))->getProperty('composer');
+        $reflectedComposer->setAccessible(TRUE);
+        $this->assertEquals($composer, $reflectedComposer->getValue($plugin));
+
+        $reflectedIo = (new \ReflectionObject($plugin))->getProperty('io');
+        $reflectedIo->setAccessible(TRUE);
+        $this->assertEquals($io, $reflectedIo->getValue($plugin));
     }
 
     public function testSubscribesToPrePackageInstallEvent()
@@ -90,7 +96,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -124,7 +130,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -141,7 +148,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -165,7 +172,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -199,7 +206,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getTargetPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getTargetPackage'])
                           ->getMock();
 
         $operation
@@ -216,7 +224,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -237,7 +245,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -268,7 +276,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -285,7 +294,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -306,7 +315,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -339,7 +348,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -356,7 +366,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -387,7 +397,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
     protected function versionFailsValidationHelper($version)
     {
         // Expect an Exception
-        $this->setExpectedException(
+        $this->expectException(
             'UnexpectedValueException',
             'The version constraint of ' . self::REPO_NAME .
             ' should be exact (with 3 or 4 digits). ' .
@@ -397,7 +407,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion'
                  ])
@@ -419,7 +429,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -436,7 +447,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -470,7 +481,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -504,7 +515,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -521,7 +533,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -545,7 +557,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock a Package
         $package = $this
                  ->getMockBuilder('Composer\Package\PackageInterface')
-                 ->setMethods([
+                 ->onlyMethods([
                      'getName',
                      'getPrettyVersion',
                      'getDistUrl',
@@ -579,7 +591,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $operation = $this
                           ->getMockBuilder($operationClass)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getJobType', 'getPackage'])
+                          ->addMethods(['getJobType'])
+                          ->onlyMethods(['getPackage'])
                           ->getMock();
 
         $operation
@@ -596,7 +609,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $packageEvent = $this
                       ->getMockBuilder('Composer\Installer\PackageEvent')
                       ->disableOriginalConstructor()
-                      ->setMethods(['getOperation'])
+                      ->onlyMethods(['getOperation'])
                       ->getMock();
 
         $packageEvent
@@ -621,7 +634,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $rfs = $this
              ->getMockBuilder('Composer\Util\RemoteFilesystem')
              ->disableOriginalConstructor()
-             ->setMethods(['getOptions', 'isTlsDisabled'])
+             ->onlyMethods(['getOptions', 'isTlsDisabled'])
              ->getMock();
 
         $rfs
@@ -642,7 +655,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock Composer
         $composer = $this
                   ->getMockBuilder('Composer\Composer')
-                  ->setMethods(['getConfig'])
+                  ->onlyMethods(['getConfig'])
                   ->getMock();
 
         $composer
@@ -659,8 +672,8 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
-                   'getProcessedUrl',
+               ->onlyMethods(['getProcessedUrl'])
+               ->addMethods([
                    'getRemoteFilesystem',
                    'setRemoteFilesystem'
                ])
@@ -681,8 +694,15 @@ class PluginTest extends \PHPUnit_Framework_TestCase
             ->method('setRemoteFilesystem')
             ->with($this->callback(
                 function ($rfs) use ($config, $io, $options, $tlsDisabled) {
-                    $this->assertAttributeEquals($config, 'config', $rfs);
-                    $this->assertAttributeEquals($io, 'io', $rfs);
+
+                    $reflectedRfsCfg = (new \ReflectionObject($rfs))->getParentClass()->getProperty('config');
+                    $reflectedRfsCfg->setAccessible(TRUE);
+                    $this->assertEquals($config, $reflectedRfsCfg->getValue($rfs));
+
+                    $reflectedRfsIo = (new \ReflectionObject($rfs))->getParentClass()->getProperty('io');
+                    $reflectedRfsIo->setAccessible(TRUE);
+                    $this->assertEquals($io, $reflectedRfsIo->getValue($rfs));
+
                     $this->assertEquals($options, $rfs->getOptions());
                     $this->assertEquals($tlsDisabled, $rfs->isTlsDisabled());
                     return true;
@@ -707,7 +727,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $rfs = $this
              ->getMockBuilder('Composer\Util\RemoteFilesystem')
              ->disableOriginalConstructor()
-             ->setMethods(['getOptions', 'isTlsDisabled'])
+             ->onlyMethods(['getOptions', 'isTlsDisabled'])
              ->getMock();
 
         $rfs
@@ -728,7 +748,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock Composer
         $composer = $this
                   ->getMockBuilder('Composer\Composer')
-                  ->setMethods(['getConfig'])
+                  ->onlyMethods(['getConfig'])
                   ->getMock();
 
         $composer
@@ -745,10 +765,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
-                   'getProcessedUrl',
-                   'getRemoteFilesystem',
-                   'setRemoteFilesystem'
+               ->addMethods([
+                'getRemoteFilesystem',
+                'setRemoteFilesystem'
+               ])
+               ->onlyMethods([
+                   'getProcessedUrl',  
                ])
                ->getMock();
 
@@ -767,11 +789,9 @@ class PluginTest extends \PHPUnit_Framework_TestCase
             ->method('setRemoteFilesystem')
             ->with($this->callback(
                 function ($rfs) use ($key) {
-                    $this->assertAttributeContains(
-                        "&k=$key",
-                        'acfFileUrl',
-                        $rfs
-                    );
+                    $reflected = (new \ReflectionObject($rfs))->getProperty('acfFileUrl');
+                    $reflected->setAccessible(TRUE);
+                    $this->assertStringContainsString("&k=$key", $reflected->getValue($rfs));
                     return true;
                 }
             ));
@@ -797,7 +817,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $rfs = $this
              ->getMockBuilder('Composer\Util\RemoteFilesystem')
              ->disableOriginalConstructor()
-             ->setMethods(['getOptions', 'isTlsDisabled'])
+             ->onlyMethods(['getOptions', 'isTlsDisabled'])
              ->getMock();
 
         $rfs
@@ -818,7 +838,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock Composer
         $composer = $this
                   ->getMockBuilder('Composer\Composer')
-                  ->setMethods(['getConfig'])
+                  ->onlyMethods(['getConfig'])
                   ->getMock();
 
         $composer
@@ -835,10 +855,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
-                   'getProcessedUrl',
+               ->addMethods([
                    'getRemoteFilesystem',
                    'setRemoteFilesystem'
+               ])
+               ->onlyMethods([
+                   'getProcessedUrl',
                ])
                ->getMock();
 
@@ -857,11 +879,9 @@ class PluginTest extends \PHPUnit_Framework_TestCase
             ->method('setRemoteFilesystem')
             ->with($this->callback(
                 function ($rfs) use ($key) {
-                    $this->assertAttributeContains(
-                        "&k=$key",
-                        'acfFileUrl',
-                        $rfs
-                    );
+                    $reflected = (new \ReflectionObject($rfs))->getProperty('acfFileUrl');
+                    $reflected->setAccessible(TRUE);
+                    $this->assertStringContainsString("&k=$key", $reflected->getValue($rfs));
                     return true;
                 }
             ));
@@ -891,7 +911,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $rfs = $this
              ->getMockBuilder('Composer\Util\RemoteFilesystem')
              ->disableOriginalConstructor()
-             ->setMethods(['getOptions', 'isTlsDisabled'])
+             ->onlyMethods(['getOptions', 'isTlsDisabled'])
              ->getMock();
 
         $rfs
@@ -912,7 +932,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         // Mock Composer
         $composer = $this
                   ->getMockBuilder('Composer\Composer')
-                  ->setMethods(['getConfig'])
+                  ->onlyMethods(['getConfig'])
                   ->getMock();
 
         $composer
@@ -929,10 +949,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
-                   'getProcessedUrl',
+               ->addMethods([
                    'getRemoteFilesystem',
                    'setRemoteFilesystem'
+               ])
+               ->onlyMethods([
+                   'getProcessedUrl',
                ])
                ->getMock();
 
@@ -951,11 +973,9 @@ class PluginTest extends \PHPUnit_Framework_TestCase
             ->method('setRemoteFilesystem')
             ->with($this->callback(
                 function ($rfs) use ($key) {
-                    $this->assertAttributeContains(
-                        "&k=$key",
-                        'acfFileUrl',
-                        $rfs
-                    );
+                    $reflected = (new \ReflectionObject($rfs))->getProperty('acfFileUrl');
+                    $reflected->setAccessible(TRUE);
+                    $this->assertStringContainsString("&k=$key", $reflected->getValue($rfs));
                     return true;
                 }
             ));
@@ -969,7 +989,7 @@ class PluginTest extends \PHPUnit_Framework_TestCase
     public function testThrowExceptionWhenKeyIsMissing()
     {
         // Expect an Exception
-        $this->setExpectedException(
+        $this->expectException(
             'PhilippBaschke\ACFProInstaller\Exceptions\MissingKeyException',
             'ACF_PRO_KEY'
         );
@@ -984,9 +1004,9 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
+               ->addMethods(['getRemoteFilesystem'])
+               ->onlyMethods([
                    'getProcessedUrl',
-                   'getRemoteFilesystem'
                ])
                ->getMock();
 
@@ -1014,10 +1034,12 @@ class PluginTest extends \PHPUnit_Framework_TestCase
         $event = $this
                ->getMockBuilder('Composer\Plugin\PreFileDownloadEvent')
                ->disableOriginalConstructor()
-               ->setMethods([
+               ->addMethods([
+                'getRemoteFilesystem',
+                'setRemoteFilesystem'
+            ])
+               ->onlyMethods([
                    'getProcessedUrl',
-                   'getRemoteFilesystem',
-                   'setRemoteFilesystem'
                ])
                ->getMock();
 
